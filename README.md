@@ -45,7 +45,7 @@ Inspired by
 
 ## Installation
 
-/kurtz speaks plain HTTP on port 8080. It does not handle TLS: put a reverse
+/kurtz speaks plain HTTP on port 8080 (change it with `PORT`). It does not handle TLS: put a reverse
 proxy or CDN in front of it to serve HTTPS.
 
 You need a PostgreSQL or MySQL database. Then:
@@ -82,6 +82,7 @@ All settings are environment variables.
 | `COOKIE_SECURE` | Users reach /kurtz over HTTPS (through your proxy): cookies get the `Secure` flag, HSTS is sent and short URLs start with `https://`. Set `false` only for plain-HTTP testing. Default `true`. | optional |
 | `CACHE_SIZE` | Number of links kept in the in-memory cache. Default `1000`. | optional |
 | `LAST_USED_FLUSH_SECS` | How often last-used dates are written to the database, in seconds. Default `60`. | optional |
+| `PORT` | Port /kurtz listens on. Default `8080`. | optional |
 | `LOG_LEVEL` | `error`, `warn`, `info` or `debug`. `info` logs startup and every 404; `debug` logs every request. Query strings and client IPs are never logged. Default `info`. | optional |
 
 

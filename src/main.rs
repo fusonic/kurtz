@@ -8,8 +8,9 @@ use tokio::{
 
 type BoxError = Box<dyn std::error::Error>;
 
-/// /kurtz always listens on this port; map it with the container runtime.
-const PORT: u16 = 8080;
+fn port() -> Result<u16, BoxError> {
+    Ok(kurtz::config::port(std::env::var("PORT").ok().as_deref())?)
+}
 
 #[tokio::main]
 async fn main() {
@@ -36,6 +37,7 @@ async fn run() -> Result<(), BoxError> {
         .init();
 
     let cfg = Config::from_env().map_err(|e| format!("configuration error: {e}"))?;
+    let port = port().map_err(|e| format!("configuration error: {e}"))?;
 
     let mut attempt = 0;
     let db = loop {
@@ -53,7 +55,7 @@ async fn run() -> Result<(), BoxError> {
     db.migrate().await.map_err(|e| format!("migrations failed: {e}"))?;
     tracing::info!("database ready ({})", db.backend());
 
-    let bind = SocketAddr::from(([0, 0, 0, 0], PORT));
+    let bind = SocketAddr::from(([0, 0, 0, 0], port));
     let state = App::new(cfg, db);
     App::spawn_flusher(state.clone());
 
@@ -93,7 +95,8 @@ async fn shutdown_signal() {
 
 /// `kurtz healthcheck`: used by the Docker HEALTHCHECK (the image has no curl).
 async fn healthcheck() -> Result<(), BoxError> {
-    let mut stream = tokio::time::timeout(Duration::from_secs(3), TcpStream::connect(("127.0.0.1", PORT)))
+    let port = port()?;
+    let mut stream = tokio::time::timeout(Duration::from_secs(3), TcpStream::connect(("127.0.0.1", port)))
         .await
         .map_err(|_| "timeout")??;
     stream
