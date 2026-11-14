@@ -765,7 +765,7 @@ pub async fn export(State(app): State<AppState>, Extension(ci): Extension<Client
         Err(e) => return server_error(e),
     };
     let name = format!(
-        "attachment; filename=\"kurtz-links-{}.csv\"",
+        "attachment; filename=\"links-{}.csv\"",
         chrono::Utc::now().format("%Y%m%d")
     );
     let mut r = (StatusCode::OK, body).into_response();
