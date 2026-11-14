@@ -96,7 +96,6 @@ pub struct ListPage {
 
 pub struct DetailView {
     pub id: i64,
-    pub slug: String,
     pub target: String,
     pub enabled: bool,
     pub tags: Vec<String>,

@@ -590,7 +590,6 @@ pub async fn detail(
     let display_url = url.split_once("://").map_or(url.as_str(), |(_, rest)| rest).to_owned();
     let d = DetailView {
         id: l.id,
-        slug: l.slug.clone(),
         target: l.target_url.clone(),
         enabled: l.enabled,
         tags: l.tags.clone(),
