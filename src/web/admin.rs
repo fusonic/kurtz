@@ -586,13 +586,15 @@ pub async fn detail(
         Ok(l) => l,
         Err(r) => return r,
     };
+    let url = ci.short_url(&ci.host, &l.slug);
+    let display_url = url.split_once("://").map_or(url.as_str(), |(_, rest)| rest).to_owned();
     let d = DetailView {
         id: l.id,
-        slug: l.slug.clone(),
         target: l.target_url.clone(),
         enabled: l.enabled,
         tags: l.tags.clone(),
-        url: ci.short_url(&ci.host, &l.slug),
+        url,
+        display_url,
         created: stamp(&l.created_at),
         updated: stamp(&l.updated_at),
         last_used: l.last_used_at.as_ref().map(stamp),

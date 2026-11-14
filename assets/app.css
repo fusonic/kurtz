@@ -18,4 +18,3 @@
 .kurtz-help { cursor: help; }
 #modal { width: min(42rem, calc(100vw - 2rem)); }
 .kurtz-fill { width: 100%; max-width: 0; }
-.kurtz-qr { max-width: 200px; }

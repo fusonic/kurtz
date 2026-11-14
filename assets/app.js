@@ -226,9 +226,9 @@
     if (copy && navigator.clipboard) {
       event.preventDefault();
       navigator.clipboard.writeText(copy.getAttribute("data-copy")).then(function () {
-        var label = copy.textContent;
-        copy.textContent = "Copied";
-        setTimeout(function () { copy.textContent = label; }, 1200);
+        var label = copy.getAttribute("title");
+        copy.setAttribute("title", "Copied");
+        setTimeout(function () { copy.setAttribute("title", label); }, 1200);
       });
       return;
     }
