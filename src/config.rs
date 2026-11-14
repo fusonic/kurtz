@@ -92,6 +92,17 @@ pub fn log_level(raw: Option<&str>) -> Result<String, String> {
     }
 }
 
+/// Validates `PORT`; defaults to 8080.
+pub fn port(raw: Option<&str>) -> Result<u16, String> {
+    match raw.map(str::trim).filter(|v| !v.is_empty()) {
+        None => Ok(8080),
+        Some(v) => match v.parse::<u16>() {
+            Ok(p) if p > 0 => Ok(p),
+            _ => Err("PORT must be a number between 1 and 65535".into()),
+        },
+    }
+}
+
 fn parse_num(var: &impl Fn(&str) -> Option<String>, key: &str, default: usize) -> Result<usize, String> {
     match var(key) {
         Some(v) => v.parse().map_err(|_| format!("{key} must be a positive number")),

@@ -36,3 +36,14 @@ fn required_and_invalid_values() {
     assert!(cfg(&[("LOG_LEVEL", "verbose")]).is_err());
     assert_eq!(cfg(&[("LOG_LEVEL", "DEBUG")]).unwrap().log_level, "debug");
 }
+
+#[test]
+fn port_defaults_and_validates() {
+    use kurtz::config::port;
+    assert_eq!(port(None), Ok(8080));
+    assert_eq!(port(Some("  ")), Ok(8080));
+    assert_eq!(port(Some("3000")), Ok(3000));
+    assert!(port(Some("0")).is_err());
+    assert!(port(Some("70000")).is_err());
+    assert!(port(Some("abc")).is_err());
+}
