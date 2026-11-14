@@ -1,0 +1,8 @@
+[advisories]
+ignore = [
+    # libsqlite3-sys is only in Cargo.lock through sqlx-sqlite, which sqlx lists
+    # for every driver. kurtz enables just postgres and mysql, so SQLite is never
+    # compiled. sqlx pins libsqlite3-sys below the patched 0.39.0; drop this entry
+    # once a sqlx release allows it.
+    "RUSTSEC-2026-0459",
+]
