@@ -111,10 +111,52 @@ fn header_help_lists_every_casing() {
     let slug = COLUMNS.iter().find(|c| c.key == "slug").unwrap();
     assert!(slug.required);
     let headers = slug.headers();
-    for name in ["slug", "Slug", "code", "short_code", "shortCode", "ShortCode"] {
+    for name in [
+        "slug",
+        "Slug",
+        "SLUG",
+        "code",
+        "short_code",
+        "short-code",
+        "shortCode",
+        "ShortCode",
+        "SHORT_CODE",
+    ] {
         assert!(headers.split(", ").any(|h| h == name), "{name} missing in {headers}");
     }
     assert!(!COLUMNS.iter().find(|c| c.key == "tags").unwrap().required);
+}
+
+#[test]
+fn every_listed_header_is_accepted() {
+    for column in COLUMNS.iter().filter(|c| c.required) {
+        for header in column.headers().split(", ") {
+            let (slug, url) = if column.key == "slug" {
+                (header, "url")
+            } else {
+                ("slug", header)
+            };
+            let csv = format!("{slug},{url}\nabc,https://e.com\n");
+            assert!(parse(csv.as_bytes()).is_ok(), "{header} is listed but not accepted");
+        }
+    }
+}
+
+#[test]
+fn headers_match_case_insensitively_in_any_style() {
+    for target in [
+        "targetUrl",
+        "TargetUrl",
+        "target_url",
+        "target-url",
+        "TARGET-URL",
+        "tArGeT_uRl",
+        "Target Url",
+    ] {
+        let csv = format!("slug,{target}\nabc,https://e.com\n");
+        let parsed = parse(csv.as_bytes()).unwrap_or_else(|e| panic!("{target} rejected: {e:?}"));
+        assert_eq!(parsed.rows[0].link.target_url, "https://e.com", "{target}");
+    }
 }
 
 #[test]

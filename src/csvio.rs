@@ -115,14 +115,16 @@ fn capitalize(w: &str) -> String {
 }
 
 impl Column {
-    /// Every accepted header name in snake_case, camelCase and PascalCase
-    /// (single words: lower case and capitalised), for display.
+    /// Every accepted header name in snake_case, kebab-case, camelCase,
+    /// PascalCase and UPPER_SNAKE_CASE (single words: lower case, capitalised
+    /// and upper case), for display.
     pub fn headers(&self) -> String {
         let mut out: Vec<String> = Vec::new();
         for words in self.names {
             if let [one] = words {
                 out.push(one.to_string());
                 out.push(capitalize(one));
+                out.push(one.to_uppercase());
                 continue;
             }
             let pascal: String = words.iter().map(|w| capitalize(w)).collect();
@@ -132,8 +134,10 @@ impl Column {
                 words[1..].iter().map(|w| capitalize(w)).collect::<String>()
             );
             out.push(words.join("_"));
+            out.push(words.join("-"));
             out.push(camel);
             out.push(pascal);
+            out.push(words.join("_").to_uppercase());
         }
         out.join(", ")
     }

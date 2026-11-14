@@ -8,6 +8,7 @@
   <title>{% block title %}/kurtz{% endblock %}</title>
   <link rel="stylesheet" href="{{ layout.css }}"{% if let Some(hash) = layout.css_integrity %} integrity="{{ hash }}" crossorigin="anonymous" referrerpolicy="no-referrer"{% endif %}>
   <link rel="stylesheet" href="{{ layout.app_css }}">
+  <script src="{{ layout.tabler_js }}"{% if let Some(hash) = layout.tabler_js_integrity %} integrity="{{ hash }}" crossorigin="anonymous" referrerpolicy="no-referrer"{% endif %} defer></script>
   <script src="{{ layout.htmx }}" defer></script>
   <script src="{{ layout.js }}" defer></script>
 </head>

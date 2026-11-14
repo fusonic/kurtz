@@ -206,7 +206,13 @@
     (root || document).querySelectorAll("input[data-tags]").forEach(enhanceTags);
   }
 
-  document.addEventListener("DOMContentLoaded", function () { init(); });
+  document.addEventListener("DOMContentLoaded", function () {
+    init();
+    // Delegated, so tooltips in content htmx swaps in later (the modal) work too.
+    if (window.tabler) {
+      new tabler.Tooltip(document.body, { selector: '[data-bs-toggle="tooltip"]' });
+    }
+  });
 
   // ---------------------------------------------------------------- modal
 
