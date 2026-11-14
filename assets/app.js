@@ -227,6 +227,14 @@
     }
   });
 
+  // Reload the link list whenever the dialog closes, so changes made inside it
+  // (import, create, edit, delete) show up. "close" does not bubble, hence capture.
+  document.addEventListener("close", function (event) {
+    if (event.target !== modal() || !window.htmx) return;
+    var search = document.querySelector('form[role="search"]');
+    if (search) htmx.trigger(search, "change");
+  }, true);
+
   document.addEventListener("click", function (event) {
     var copy = event.target.closest("[data-copy]");
     if (copy && navigator.clipboard) {
