@@ -25,12 +25,22 @@ include!(concat!(env!("OUT_DIR"), "/tabler.rs"));
 pub struct Assets {
     /// Tabler, embedded in release images; `None` loads it from the CDN.
     pub css: Option<Asset>,
+    /// Tabler's script, embedded together with the stylesheet.
+    pub tabler_js: Option<Asset>,
     pub app_css: Asset,
     pub htmx: Asset,
     pub js: Asset,
 }
 
 impl Assets {
+    /// `src` and, for the CDN copy, the `integrity` hash of Tabler's script.
+    pub fn tabler_script(&self) -> (String, Option<String>) {
+        match &self.tabler_js {
+            Some(js) => (js.path.clone(), None),
+            None => (TABLER_JS_CDN_URL.to_string(), Some(TABLER_JS_SRI.to_string())),
+        }
+    }
+
     /// `href` and, for the CDN copy, the `integrity` hash of the stylesheet.
     pub fn stylesheet(&self) -> (String, Option<String>) {
         match &self.css {
@@ -52,6 +62,15 @@ impl Default for Assets {
             )),
             #[cfg(not(tabler_embedded))]
             css: None,
+            #[cfg(tabler_embedded)]
+            tabler_js: Some(Asset::new(
+                "tabler",
+                "js",
+                "text/javascript; charset=utf-8",
+                include_bytes!("../assets/dist/tabler.min.js"),
+            )),
+            #[cfg(not(tabler_embedded))]
+            tabler_js: None,
             app_css: Asset::new(
                 "app",
                 "css",
@@ -78,6 +97,7 @@ impl Assets {
     pub fn get(&self, path: &str) -> Option<&Asset> {
         self.css
             .iter()
+            .chain(self.tabler_js.iter())
             .chain([&self.app_css, &self.htmx, &self.js])
             .find(|a| a.path == path)
     }

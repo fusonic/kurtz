@@ -10,6 +10,9 @@ pub struct Layout {
     pub app_css: String,
     /// SRI hash when the stylesheet comes from the CDN.
     pub css_integrity: Option<String>,
+    pub tabler_js: String,
+    /// SRI hash when Tabler's script comes from the CDN.
+    pub tabler_js_integrity: Option<String>,
     pub htmx: String,
     pub js: String,
     pub csrf: String,

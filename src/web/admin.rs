@@ -150,9 +150,12 @@ fn require_post(app: &AppState, headers: &HeaderMap, ci: &ClientInfo, token: &st
 
 fn layout(app: &AppState, admin: Option<&Admin>) -> Layout {
     let (css, css_integrity) = app.assets.stylesheet();
+    let (tabler_js, tabler_js_integrity) = app.assets.tabler_script();
     Layout {
         css,
         css_integrity,
+        tabler_js,
+        tabler_js_integrity,
         app_css: app.assets.app_css.path.clone(),
         htmx: app.assets.htmx.path.clone(),
         js: app.assets.js.path.clone(),

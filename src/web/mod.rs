@@ -254,14 +254,14 @@ async fn context(State(app): State<AppState>, mut req: Request, next: Next) -> R
     }
     if is_admin {
         set(h, header::CACHE_CONTROL, "no-store");
-        // Without the embedded Tabler copy (development) the stylesheet comes from the CDN.
-        let styles = if app.assets.css.is_some() {
+        // Without the embedded Tabler copy (development) stylesheet and script come from the CDN.
+        let cdn = if app.assets.css.is_some() {
             "'self'"
         } else {
             "'self' https://cdn.jsdelivr.net"
         };
         let csp = format!(
-            "default-src 'self'; img-src 'self' data:; style-src {styles}; script-src 'self'; \
+            "default-src 'self'; img-src 'self' data:; style-src {cdn}; script-src {cdn}; \
              frame-ancestors 'none'; form-action 'self'; base-uri 'none'"
         );
         if let Ok(v) = HeaderValue::from_str(&csp) {

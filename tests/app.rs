@@ -638,6 +638,18 @@ async fn root_redirect_and_static_assets() {
             }
             None => assert_eq!(app.get(HOST_A, &href, None).await.status, StatusCode::OK),
         }
+
+        // The script follows the same rule as the stylesheet.
+        let (src, integrity) = app.state.assets.tabler_script();
+        assert!(page.contains(&src));
+        match integrity {
+            Some(hash) => {
+                assert!(hash.starts_with("sha384-"));
+                assert!(src.contains("/@tabler/core@") && !src.contains("@latest"));
+                assert!(page.contains(&format!("integrity=\"{hash}\"")));
+            }
+            None => assert_eq!(app.get(HOST_A, &src, None).await.status, StatusCode::OK),
+        }
     }
 }
 

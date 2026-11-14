@@ -58,11 +58,12 @@ CI runs the suite against PostgreSQL plus both MySQL 9 and MariaDB 12.
 Templates are [Askama](https://github.com/askama-rs/askama) files in
 [`templates/`](templates); they are compiled into the binary, so template errors
 are compile errors. Styling is [Tabler](https://tabler.io): no build step, no Node.
-The version and its SRI hash are pinned in [`assets/tabler.lock`](assets/tabler.lock).
-In development the pages load Tabler from the jsDelivr CDN with that hash as
-`integrity`; the Docker build downloads the same file, `build.rs` verifies it
-against the hash and the binary embeds it. To upgrade, change both values in the
-lock file (the file explains how to compute the hash).
+The version and the SRI hashes of its stylesheet and script (Bootstrap tooltips)
+are pinned in [`assets/tabler.lock`](assets/tabler.lock).
+In development the pages load both from the jsDelivr CDN with those hashes as
+`integrity`; the Docker build downloads the same files, `build.rs` verifies them
+against the hashes and the binary embeds them. To upgrade, change the version
+and both hashes in the lock file (the file explains how to compute them).
 
 JavaScript is optional enhancement only: every page must keep working with
 JavaScript disabled. htmx is vendored in `assets/vendor/`.
