@@ -1,8 +1,6 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
-    <img src="docs/logo-light.svg" alt="/kurtz" width="440">
-  </picture>
+  <img src="docs/logo-light.svg#gh-light-mode-only" alt="/kurtz" width="440">
+  <img src="docs/logo-dark.svg#gh-dark-mode-only" alt="/kurtz" width="440">
 </p>
 
 <p align="center"><strong>Modern, high performance URL shortener for self-hosting, built with Rust.</strong><br>
