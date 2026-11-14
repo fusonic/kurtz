@@ -111,10 +111,35 @@ fn header_help_lists_every_casing() {
     let slug = COLUMNS.iter().find(|c| c.key == "slug").unwrap();
     assert!(slug.required);
     let headers = slug.headers();
-    for name in ["slug", "Slug", "code", "short_code", "shortCode", "ShortCode"] {
+    for name in [
+        "slug",
+        "Slug",
+        "SLUG",
+        "code",
+        "short_code",
+        "short-code",
+        "shortCode",
+        "ShortCode",
+        "SHORT_CODE",
+    ] {
         assert!(headers.split(", ").any(|h| h == name), "{name} missing in {headers}");
     }
     assert!(!COLUMNS.iter().find(|c| c.key == "tags").unwrap().required);
+}
+
+#[test]
+fn every_listed_header_is_accepted() {
+    for column in COLUMNS.iter().filter(|c| c.required) {
+        for header in column.headers().split(", ") {
+            let (slug, url) = if column.key == "slug" {
+                (header, "url")
+            } else {
+                ("slug", header)
+            };
+            let csv = format!("{slug},{url}\nabc,https://e.com\n");
+            assert!(parse(csv.as_bytes()).is_ok(), "{header} is listed but not accepted");
+        }
+    }
 }
 
 #[test]
