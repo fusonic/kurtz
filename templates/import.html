@@ -14,13 +14,13 @@
       <div class="col-sm-6">
         <div class="subheader mb-1">Required columns</div>
         <ul class="list-unstyled mb-3 mb-sm-0">
-          {% for c in columns %}{% if c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" title="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
+          {% for c in columns %}{% if c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" data-tip="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
         </ul>
       </div>
       <div class="col-sm-6">
         <div class="subheader mb-1">Optional columns</div>
         <ul class="list-unstyled mb-0">
-          {% for c in columns %}{% if !c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" title="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
+          {% for c in columns %}{% if !c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" data-tip="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
         </ul>
       </div>
     </div>

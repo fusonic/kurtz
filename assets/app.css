@@ -15,7 +15,14 @@
 .kurtz-suggest li { padding: .375rem .75rem; cursor: pointer; }
 .kurtz-suggest li.active { background: color-mix(in oklab, var(--tblr-primary) 15%, transparent); }
 .kurtz-contents { display: contents; }
-.kurtz-help { cursor: help; }
+.kurtz-help { position: relative; cursor: help; }
+/* Native title tooltips cannot be styled and render see-through in some themes. */
+.kurtz-help::after { content: attr(data-tip); position: absolute; z-index: 1090; left: 0; top: 100%; margin-top: .25rem;
+  width: max-content; max-width: 20rem; padding: .375rem .625rem; border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius); background: var(--tblr-bg-surface); color: var(--tblr-body-color);
+  box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .25); font-size: .75rem; white-space: normal; pointer-events: none;
+  opacity: 0; visibility: hidden; }
+.kurtz-help:hover::after, .kurtz-help:focus::after { opacity: 1; visibility: visible; }
 #modal { width: min(42rem, calc(100vw - 2rem)); }
 .kurtz-fill { width: 100%; max-width: 0; }
 .kurtz-qr { max-width: 200px; }
