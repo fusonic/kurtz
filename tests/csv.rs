@@ -143,6 +143,23 @@ fn every_listed_header_is_accepted() {
 }
 
 #[test]
+fn headers_match_case_insensitively_in_any_style() {
+    for target in [
+        "targetUrl",
+        "TargetUrl",
+        "target_url",
+        "target-url",
+        "TARGET-URL",
+        "tArGeT_uRl",
+        "Target Url",
+    ] {
+        let csv = format!("slug,{target}\nabc,https://e.com\n");
+        let parsed = parse(csv.as_bytes()).unwrap_or_else(|e| panic!("{target} rejected: {e:?}"));
+        assert_eq!(parsed.rows[0].link.target_url, "https://e.com", "{target}");
+    }
+}
+
+#[test]
 fn shlink_export_is_understood() {
     let csv = "\"createdAt\",\"domain\",\"shortCode\",\"shortUrl\",\"longUrl\",\"title\",\"tags\",\"visits\"\n\
 \"2026-10-14T13:41:46+02:00\",\"a.test\",\"Case-Study\",\"https://a.test/Case-Study\",\"https://e.com/p?x=1\",\"Some title\",\"casestudy|award\",21\n\
