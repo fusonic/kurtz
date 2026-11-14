@@ -387,7 +387,7 @@ async fn qr_is_admin_only() {
             .get(HOST_A, &format!("/admin/links/{id}/qr?format=svg&download=1"), Some(&s))
             .await;
         assert_eq!(svg.header("content-type"), "image/svg+xml");
-        assert!(svg.header("content-disposition").starts_with("attachment"));
+        assert_eq!(svg.header("content-disposition"), "attachment; filename=\"qr1.svg\"");
         assert!(svg.text().contains("fill=\"#000\""));
     }
 }

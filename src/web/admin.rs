@@ -728,7 +728,7 @@ pub async fn qr(
         _ => return (StatusCode::BAD_REQUEST, "format must be svg or png\n").into_response(),
     };
     let disposition = format!(
-        "{}; filename=\"kurtz-{}.{ext}\"",
+        "{}; filename=\"{}.{ext}\"",
         if query.download.is_some() {
             "attachment"
         } else {
