@@ -102,6 +102,8 @@ pub struct DetailView {
     pub tags: Vec<String>,
     /// Short URL as the admin reaches it (scheme, host and port of the request).
     pub url: String,
+    /// `url` without its scheme, for display.
+    pub display_url: String,
     pub created: Stamp,
     pub updated: Stamp,
     pub last_used: Option<Stamp>,
