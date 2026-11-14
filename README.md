@@ -46,7 +46,7 @@ Inspired by
 ## Installation
 
 /kurtz speaks plain HTTP on port 8080. It does not handle TLS: put a reverse
-proxy or CDN in front of it to serve HTTPS (see [Reverse proxy](#reverse-proxy)).
+proxy or CDN in front of it to serve HTTPS.
 
 You need a PostgreSQL or MySQL database. Then:
 
@@ -65,7 +65,7 @@ docker run -p 8080:8080 \
   ghcr.io/fusonic/kurtz:latest
 ```
 
-Point your domain at the reverse proxy, forward it to port 8080 and open
+Point your domain at your proxy, forward it to port 8080 and open
 `https://s.example.com/admin`. Database migrations run automatically on every start.
 
 ## Configuration
@@ -84,44 +84,6 @@ All settings are environment variables.
 | `LAST_USED_FLUSH_SECS` | How often last-used dates are written to the database, in seconds. Default `60`. | optional |
 | `LOG_LEVEL` | `error`, `warn`, `info` or `debug`. `info` logs startup and every 404; `debug` logs every request. Query strings and client IPs are never logged. Default `info`. | optional |
 
-
-## Reverse proxy
-
-Redirects work on any hostname. The admin shows short URLs and QR codes with the
-scheme, host and port the visitor used. The host comes from the first of these
-headers that is set, with `Host` as the fallback:
-
-1. `X-Forwarded-Host`
-2. `Forwarded` (`host=`)
-3. `X-Original-Host`
-4. `X-Host`
-
-The scheme comes from `X-Forwarded-Proto`, `Forwarded` (`proto=`),
-`CloudFront-Forwarded-Proto` or `X-Forwarded-Scheme`; without any of them it is
-`https`, or `http` if `COOKIE_SECURE=false`.
-
-CloudFront and Cloudflare have no host header of their own. Cloudflare passes
-the visitor's `Host` through unchanged. For CloudFront, use an origin request
-policy that forwards the `Host` header, or add `X-Forwarded-Host` as a custom
-origin header.
-
-These headers are trusted from anyone and only decide which URLs the admin
-shows, so run /kurtz behind your proxy.
-
-**nginx** example:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name s.example.com;
-    # ssl_certificate …; ssl_certificate_key …;
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
 
 ## How it behaves
 
@@ -148,6 +110,41 @@ instance.
 and fully migrated, otherwise `503 NOT_OK`. The reason is only written to the log. It works on any hostname, so
 load balancers and uptime monitors can use it; the Docker image's `HEALTHCHECK`
 calls it too.
+
+## FAQ
+
+### My admin panel shows the wrong domain, and URLs and QR codes are wrong.
+
+Redirects work on any hostname. The admin builds short URLs and QR codes from the
+scheme, host and port the visitor used. Behind a proxy or CDN, /kurtz only sees
+what the proxy sends it, which is often the internal hostname and plain HTTP.
+Make your proxy pass the original values on.
+
+The host comes from the first of these headers that is set, with `Host` as the
+fallback:
+
+1. `X-Forwarded-Host`
+2. `Forwarded` (`host=`)
+3. `X-Original-Host`
+4. `X-Host`
+
+The scheme comes from the first of these:
+
+1. `X-Forwarded-Proto`
+2. `Forwarded` (`proto=`)
+3. `CloudFront-Forwarded-Proto`
+4. `X-Forwarded-Scheme`
+
+Without any of them the scheme is `https`, or `http` if `COOKIE_SECURE=false`.
+
+- **nginx:** add `proxy_set_header Host $host;` and
+  `proxy_set_header X-Forwarded-Proto $scheme;` to the `location` that proxies to /kurtz.
+- **CloudFront:** it sends no visitor host of its own. Use an origin request policy
+  that forwards the `Host` header, or add `X-Forwarded-Host` as a custom origin header.
+- **Cloudflare:** passes the visitor's `Host` through unchanged; nothing to do.
+
+These headers are trusted from anyone and only decide which URLs the admin shows,
+so run /kurtz behind your proxy.
 
 ## Privacy
 
