@@ -1,0 +1,69 @@
+<form method="post" action="/admin/import" enctype="multipart/form-data" hx-post="/admin/import" hx-encoding="multipart/form-data" hx-target="#modal-body" hx-swap="innerHTML">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <div class="card-header justify-content-between">
+    <h1 id="modal-title" class="card-title">Import links from CSV</h1>
+    <a href="/admin" class="btn-close" data-close-modal aria-label="Close"></a>
+  </div>
+  <div class="card-body">
+    <p class="text-secondary small">
+      Headers are matched ignoring case, underscores, hyphens and spaces. Each column may appear only once;
+      other columns are ignored. The file is imported completely or not at all, with the line number of the
+      first invalid row. Up to 5 MB and 50,000 rows. Hover ⓘ to see every accepted header name.
+    </p>
+    <div class="row small mb-3">
+      <div class="col-sm-6">
+        <div class="subheader mb-1">Required columns</div>
+        <ul class="list-unstyled mb-3 mb-sm-0">
+          {% for c in columns %}{% if c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" title="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
+        </ul>
+      </div>
+      <div class="col-sm-6">
+        <div class="subheader mb-1">Optional columns</div>
+        <ul class="list-unstyled mb-0">
+          {% for c in columns %}{% if !c.required %}<li><span class="font-monospace">{{ c.key }}</span> <span class="kurtz-help" tabindex="0" title="{{ c.headers }}" aria-label="Accepted headers: {{ c.headers }}">ⓘ</span> <span class="text-secondary">{{ c.hint }}</span></li>{% endif %}{% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    {% if !errors.is_empty() %}
+    <div class="alert alert-danger" role="alert">
+      <p class="fw-bold mb-2">Nothing was imported. Fix these rows and try again:</p>
+      <ul class="mb-0 ps-3">{% for e in errors %}<li>{% if e.line > 0 %}Line {{ e.line }}: {% endif %}{{ e.message }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    {% if let Some(r) = report %}
+    <div class="alert {% if r.committed %}alert-success{% else %}alert-info{% endif %}" role="status">
+      <p class="fw-bold mb-2">{% if r.committed %}Import finished.{% else %}Preview: nothing has been saved yet.{% endif %}</p>
+      <dl class="row mb-0">
+        <dt class="col-8 fw-normal">New</dt><dd class="col-4 mb-0">{{ r.created }}</dd>
+        <dt class="col-8 fw-normal">Skipped (slug already in use)</dt><dd class="col-4 mb-0">{{ r.skipped }}</dd>
+        <dt class="col-8 fw-normal">Overwritten</dt><dd class="col-4 mb-0">{{ r.overwritten }}</dd>
+        <dt class="col-8 fw-normal">Target already shortened</dt><dd class="col-4 mb-0">{{ r.duplicate_targets }}</dd>
+      </dl>
+      {% if !r.ignored_columns.is_empty() %}<p class="mt-2 mb-0">Ignored columns: {{ r.ignored_columns }}.</p>{% endif %}
+      {% if !r.skipped_rows.is_empty() %}
+      <details class="mt-2">
+        <summary>Show {{ r.skipped_rows.len() }} skipped {% if r.skipped_rows.len() == 1 %}row{% else %}rows{% endif %}</summary>
+        <ul class="mt-2 mb-0 ps-3">{% for e in r.skipped_rows %}<li>Line {{ e.line }}: {{ e.message }}</li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+      {% if r.committed %}<p class="mt-2 mb-0"><a href="/admin">Back to the list</a></p>{% else %}<p class="mt-2 mb-0">Choose the file again and select Import to save.</p>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="mb-3">
+      <label for="file" class="form-label">CSV file</label>
+      <input id="file" name="file" type="file" accept=".csv,text/csv" required class="form-control">
+    </div>
+    <fieldset>
+      <legend class="form-label">When a slug is already in use</legend>
+      <label class="form-check form-check-inline"><input class="form-check-input" type="radio" name="conflict" value="skip" {% if !overwrite %}checked{% endif %}><span class="form-check-label">Skip the row</span></label>
+      <label class="form-check form-check-inline"><input class="form-check-input" type="radio" name="conflict" value="overwrite" {% if overwrite %}checked{% endif %}><span class="form-check-label">Replace the existing link</span></label>
+    </fieldset>
+  </div>
+  <div class="card-footer d-flex justify-content-end gap-2">
+    <button type="submit" name="action" value="preview" class="btn">Preview</button>
+    <button type="submit" name="action" value="import" class="btn btn-primary">Import</button>
+  </div>
+</form>

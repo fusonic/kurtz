@@ -1,0 +1,59 @@
+[package]
+name = "kurtz"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.94"
+license = "MIT"
+description = "/kurtz: modern, high performance URL shortener for self-hosting, built with Rust."
+repository = "https://github.com/fusonic/kurtz"
+readme = "README.md"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "kurtz"
+path = "src/main.rs"
+
+[dependencies]
+argon2 = "0.6"
+askama = "0.16"
+axum = { version = "0.8", features = ["multipart"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+csv = "1"
+getrandom = "0.4"
+hmac = "0.13"
+lru = "0.19"
+png = "0.18"
+qrcode = { version = "0.14", default-features = false }
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.11"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "mysql", "chrono", "migrate", "macros"] }
+subtle = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync", "io-util"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+url = "2"
+
+[build-dependencies]
+base64 = "0.23"
+sha2 = "0.11"
+
+[dev-dependencies]
+http-body-util = "0.1"
+rqrr = "0.11"
+tower = { version = "0.5", features = ["util"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = 3
+panic = "abort"
+
+# Password hashing is slow without optimisation; keep debug builds and tests fast.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3

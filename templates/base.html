@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="htmx-config" content='{"includeIndicatorStyles":false,"allowEval":false}'>
+  <title>{% block title %}/kurtz{% endblock %}</title>
+  <link rel="stylesheet" href="{{ layout.css }}"{% if let Some(hash) = layout.css_integrity %} integrity="{{ hash }}" crossorigin="anonymous" referrerpolicy="no-referrer"{% endif %}>
+  <link rel="stylesheet" href="{{ layout.app_css }}">
+  <script src="{{ layout.htmx }}" defer></script>
+  <script src="{{ layout.js }}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block page %}
+  <div class="page">
+    <header class="navbar navbar-expand-md border-bottom">
+      <div class="container-xl">
+        <a href="/admin" class="navbar-brand font-monospace fw-bold fs-2" aria-label="/kurtz home"><span class="kurtz-slash">/</span>kurtz</a>
+        {% if layout.logged_in %}
+        <ul class="navbar-nav flex-row align-items-center gap-3">
+          <li class="nav-item"><a href="/admin/import" class="nav-link p-0" hx-get="/admin/import" hx-target="#modal-body" hx-swap="innerHTML">Import</a></li>
+          <li class="nav-item"><a href="/admin/export.csv" class="nav-link p-0">Export</a></li>
+          <li class="nav-item">
+            <form method="post" action="/admin/logout">
+              <input type="hidden" name="_csrf" value="{{ layout.csrf }}">
+              <button type="submit" class="btn btn-sm">Log out</button>
+            </form>
+          </li>
+        </ul>
+        {% endif %}
+      </div>
+    </header>
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-xl">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+  {% if layout.logged_in %}
+  <dialog id="modal" aria-labelledby="modal-title" class="border-0 bg-transparent p-0">
+    <div id="modal-body" class="card"></div>
+  </dialog>
+  {% endif %}
+</body>
+</html>

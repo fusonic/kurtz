@@ -1,0 +1,74 @@
+# Local development stack. Start with `make start`, stop with `make stop`.
+#
+# - app:      Kurtz as a one-time debug build (`cargo run`, no watcher; stop with
+#             Ctrl+C and start again after changes).
+#             http://localhost:8080/admin, password "dev".
+# - postgres / mysql: each has a `kurtz` database for the app and a
+#             `kurtz_test` database for `make test` (the tests wipe it).
+name: kurtz-dev
+
+services:
+  app:
+    image: rust:1.99-bookworm
+    working_dir: /app
+    command: cargo run
+    environment:
+      DATABASE_URL: ${KURTZ_DEV_DATABASE_URL:-postgres://kurtz:kurtz@postgres:5432/kurtz}
+      ADMIN_PASSWORD: "$$argon2i$$v=19$$m=4096,t=3,p=1$$ZTY1OWY0Y2U3NjZiOGZkMjJlMTlkOWIyZDI5ZTNmMzU$$NZhOC45NwY930Q9yK0vY0iV2Den3IOpVCDUNCv3mF6Q"
+      SESSION_SECRET: dev-only-secret-dev-only-secret-dev-only-secret-dev-only-secret!
+      COOKIE_SECURE: "false"
+      LOG_LEVEL: ${KURTZ_DEV_LOG_LEVEL:-debug}
+      LAST_USED_FLUSH_SECS: "5"
+      CARGO_TARGET_DIR: /target
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - cargo-registry:/usr/local/cargo/registry
+      - target:/target
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: kurtz
+      POSTGRES_PASSWORD: kurtz
+      POSTGRES_DB: kurtz
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+      - ./dev/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kurtz"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  mysql:
+    image: mysql:9
+    environment:
+      MYSQL_USER: kurtz
+      MYSQL_PASSWORD: kurtz
+      MYSQL_DATABASE: kurtz
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./dev/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+volumes:
+  postgres:
+  mysql:
+  cargo-registry:
+  target:

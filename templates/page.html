@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · /kurtz{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-8 mx-auto"><div class="card">{{ body|safe }}</div></div></div>
+{% endblock %}

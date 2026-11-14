@@ -1,0 +1,61 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test (PostgreSQL + ${{ matrix.mysql }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ["mysql:9", "mariadb:12"]
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: kurtz
+          POSTGRES_PASSWORD: kurtz
+          POSTGRES_DB: kurtz
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U kurtz"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      mysql:
+        image: ${{ matrix.mysql }}
+        env:
+          MYSQL_USER: kurtz
+          MYSQL_PASSWORD: kurtz
+          MYSQL_DATABASE: kurtz
+          MYSQL_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+    env:
+      KURTZ_TEST_POSTGRES_URL: postgres://kurtz:kurtz@127.0.0.1:5432/kurtz
+      KURTZ_TEST_MYSQL_URL: mysql://kurtz:kurtz@127.0.0.1:3306/kurtz
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 60); do
+            (echo > /dev/tcp/127.0.0.1/3306) 2>/dev/null && exit 0
+            sleep 2
+          done
+          echo "MySQL did not start" && exit 1
+
+      - name: Test
+        run: cargo test --locked

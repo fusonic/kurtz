@@ -1,0 +1,21 @@
+/* Brand colors on top of Tabler: glacier blue, sky blue in dark mode. Dark mode
+   follows the operating system. The rest are things Tabler has no class for. */
+:root {
+  color-scheme: light dark;
+  --tblr-primary: #2e6e8e;
+  --tblr-primary-rgb: 46, 110, 142;
+  --tblr-primary-darken: #23566f;
+  --tblr-link-color: light-dark(#2e6e8e, #7dd3fc);
+  --tblr-link-hover-color: light-dark(#23566f, #bae6fd);
+}
+.kurtz-slash { color: light-dark(#2e6e8e, #7dd3fc); }
+/* Tag suggestions: Tabler has no dropdown for a plain list. */
+.kurtz-suggest { z-index: 1080; margin: .25rem 0 0; padding: .25rem 0; max-height: 15rem; overflow: auto; list-style: none;
+  background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius); }
+.kurtz-suggest li { padding: .375rem .75rem; cursor: pointer; }
+.kurtz-suggest li.active { background: color-mix(in oklab, var(--tblr-primary) 15%, transparent); }
+.kurtz-contents { display: contents; }
+.kurtz-help { cursor: help; }
+#modal { width: min(42rem, calc(100vw - 2rem)); }
+.kurtz-fill { width: 100%; max-width: 0; }
+.kurtz-qr { max-width: 200px; }

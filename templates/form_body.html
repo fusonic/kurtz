@@ -1,0 +1,58 @@
+<form method="post" action="{{ f.action }}" hx-post="{{ f.action }}" hx-target="#modal-body" hx-swap="innerHTML" novalidate>
+  <input type="hidden" name="_csrf" value="{{ f.csrf }}">
+  <div class="card-header justify-content-between">
+    <h1 id="modal-title" class="card-title">{{ f.title }}</h1>
+    <a href="{{ f.cancel_url }}" class="btn-close" data-close-modal aria-label="Close"></a>
+  </div>
+  <div class="card-body">
+    {% if !f.errors.is_empty() %}
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0 ps-3">{% for e in f.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    {% if !f.duplicates.is_empty() %}
+    <div class="alert alert-info" role="status">
+      <p class="fw-bold mb-2">This target already has a short link:</p>
+      <ul class="mb-2 ps-3">
+        {% for dup in f.duplicates %}<li><a href="/admin/links/{{ dup.id }}" class="font-monospace" hx-get="/admin/links/{{ dup.id }}" hx-target="#modal-body" hx-swap="innerHTML">{{ dup.url }}</a> <span class="text-secondary">created <time datetime="{{ dup.created.iso }}" data-time="date">{{ dup.created.text }}</time></span></li>{% endfor %}
+      </ul>
+      <input type="hidden" name="confirm_duplicate" value="1">
+      <p class="mb-0">Submit again to create another one anyway.</p>
+    </div>
+    {% endif %}
+
+    <div class="mb-3">
+      <label for="target" class="form-label">Target URL</label>
+      <input id="target" name="target" type="url" value="{{ f.target }}" required maxlength="2048" placeholder="https://example.com/a/long/path?with=query" class="form-control">
+      <div class="form-hint">Query string and #fragment are kept. Query parameters on the short link are passed through.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="slug" class="form-label">Slug</label>
+      {% if f.is_edit %}
+      <input id="slug" type="text" value="{{ f.slug }}" disabled class="form-control font-monospace">
+      <div class="form-hint">The slug cannot be changed after creation.</div>
+      {% else %}
+      <input id="slug" name="slug" type="text" value="{{ f.slug }}" maxlength="64" pattern="[a-zA-Z0-9-]+" autocapitalize="off" spellcheck="false" placeholder="Leave empty for a random one" class="form-control font-monospace">
+      <div class="form-hint">a–z, 0–9 and hyphens. Uppercase is converted to lowercase. Empty means {{ f.slug_length }} random characters.</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="tags" class="form-label">Tags</label>
+      <input id="tags" name="tags" type="text" value="{{ f.tags }}" data-tags data-suggestions="{{ f.tag_suggestions }}"
+             autocomplete="off" placeholder="e.g. marketing, docs" class="form-control">
+      <div class="form-hint">Separate with commas. Up to 10 tags; letters, digits, spaces, - _ and .</div>
+    </div>
+
+    <label class="form-check mb-0">
+      <input class="form-check-input" type="checkbox" name="enabled" value="on" {% if f.enabled %}checked{% endif %}>
+      <span class="form-check-label">Link is active</span>
+    </label>
+  </div>
+  <div class="card-footer d-flex justify-content-end gap-2">
+    <a href="{{ f.cancel_url }}" class="btn" data-close-modal>Cancel</a>
+    <button type="submit" class="btn btn-primary">{{ f.submit_label }}</button>
+  </div>
+</form>

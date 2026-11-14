@@ -1,0 +1,5 @@
+# Tabler is loaded from the jsdelivr CDN in development and embedded into the
+# Docker image. Bump both values together: curl the file and run
+#   echo sha384-$(openssl dgst -sha384 -binary tabler.min.css | openssl base64 -A)
+TABLER_VERSION=1.7.5
+TABLER_SHA384=sha384-BY4EnLpEeqBnDZno/u4SjmwHqbv1/U9as69Q0Jk/zeaDJ8iV10NK7FP+6fFEGW4i

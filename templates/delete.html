@@ -1,0 +1,16 @@
+<form method="post" action="/admin/links/{{ id }}/delete" hx-post="/admin/links/{{ id }}/delete">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <div class="card-header justify-content-between">
+    <h1 id="modal-title" class="card-title">Delete <span class="font-monospace">/{{ slug }}</span>?</h1>
+    <a href="/admin" class="btn-close" data-close-modal aria-label="Close"></a>
+  </div>
+  <div class="card-body">
+    <p class="mb-1">It points to:</p>
+    <p class="text-secondary text-break">{{ target }}</p>
+    <p class="mb-0">The short link stops working immediately. This cannot be undone; switching it off keeps it instead.</p>
+  </div>
+  <div class="card-footer d-flex justify-content-end gap-2">
+    <a href="/admin/links/{{ id }}" class="btn" hx-get="/admin/links/{{ id }}" hx-target="#modal-body" hx-swap="innerHTML">Keep it</a>
+    <button type="submit" class="btn btn-danger">Delete link</button>
+  </div>
+</form>
