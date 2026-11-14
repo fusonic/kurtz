@@ -114,6 +114,19 @@ calls it too.
 
 ## FAQ
 
+### Why another URL shortener?
+
+/kurtz is inspired by a lot of existing solutions, but none of them satisfied in
+every aspect:
+
+- **[Chhoto](https://github.com/SinTan1729/chhoto-url):** great tool, but no support
+  for Postgres and no modern UI.
+- **[Shlink](https://github.com/shlinkio/shlink):** great, but its memory usage is
+  30x higher than /kurtz's.
+- **[Kutt](https://github.com/thedevs-network/kutt) and
+  [YOURLS](https://github.com/YOURLS/YOURLS):** great, but also resource heavy, as
+  they are built on a scripting ecosystem (Node and PHP respectively).
+
 ### My admin panel shows the wrong domain, and URLs and QR codes are wrong.
 
 Redirects work on any hostname. The admin builds short URLs and QR codes from the
