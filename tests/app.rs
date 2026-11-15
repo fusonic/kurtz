@@ -671,6 +671,10 @@ async fn tags_create_filter_search_and_edit() {
             vec![("docs".into(), 1), ("marketing".into(), 1), ("rust".into(), 1)]
         );
 
+        // the list form refreshes the tag filter out of band, even when it is currently hidden
+        let list = app.get(HOST_A, "/admin", Some(&s)).await.text();
+        assert!(list.contains("hx-select-oob=\"#tag-filter\"") && list.contains("<span id=\"tag-filter\">"));
+
         // filter by tag
         let list = app.get(HOST_A, "/admin?tag=rust", Some(&s)).await.text();
         assert!(list.contains(">/docs</a>") && !list.contains(">/blog</a>") && !list.contains(">/plain</a>"));
