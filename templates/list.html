@@ -23,9 +23,11 @@
 </form>
 
 <form method="get" action="/admin" role="search" class="d-flex align-items-center gap-2 mb-3"
-      hx-get="/admin" hx-trigger="input changed delay:200ms, change, search, submit" hx-target="#rows" hx-select="#rows" hx-swap="outerHTML" hx-push-url="true">
+      hx-get="/admin" hx-trigger="input changed delay:200ms, change, search, submit" hx-target="#rows" hx-select="#rows" hx-select-oob="#tag-filter" hx-swap="outerHTML" hx-push-url="true">
   <label for="q" class="visually-hidden">Search links</label>
   <input id="q" name="q" type="search" value="{{ q }}" placeholder="Search" autocomplete="off" class="form-control form-control-sm w-auto" size="16">
+  {# Always rendered so a filter that appears later (e.g. after an import) can be swapped in. #}
+  <span id="tag-filter">
   {% if !tag_filters.is_empty() || !tag.is_empty() %}
   <label for="tag" class="visually-hidden">Filter by tag</label>
   <select id="tag" name="tag" class="form-select form-select-sm w-auto">
@@ -33,6 +35,7 @@
     {% for t in tag_filters %}<option value="{{ t.name }}" {% if t.active %}selected{% endif %}>#{{ t.name }} ({{ t.count }})</option>{% endfor %}
   </select>
   {% endif %}
+  </span>
   <noscript><button type="submit" class="btn btn-sm">Filter</button></noscript>
 </form>
 
