@@ -1,4 +1,7 @@
-use std::{net::SocketAddr, time::Duration};
+use std::{
+    net::{Ipv4Addr, Ipv6Addr, SocketAddr},
+    time::Duration,
+};
 
 use kurtz::{config::Config, db::Db, router, App};
 use tokio::{
@@ -55,13 +58,10 @@ async fn run() -> Result<(), BoxError> {
     db.migrate().await.map_err(|e| format!("migrations failed: {e}"))?;
     tracing::info!("database ready ({})", db.backend());
 
-    let bind = SocketAddr::from(([0, 0, 0, 0], port));
     let state = App::new(cfg, db);
     App::spawn_flusher(state.clone());
 
-    let listener = TcpListener::bind(bind)
-        .await
-        .map_err(|e| format!("could not bind {bind}: {e}"))?;
+    let (listener, bind) = bind_listener(port).await?;
     tracing::info!("listening on {bind}");
     axum::serve(listener, router(state.clone()))
         .with_graceful_shutdown(shutdown_signal())
@@ -91,6 +91,21 @@ async fn shutdown_signal() {
         _ = ctrl_c => {},
         _ = term => {},
     }
+}
+
+/// Listens on all interfaces. `[::]` also accepts IPv4 on a default Linux
+/// setup and is the only option in IPv6-only clusters; where IPv6 is disabled
+/// (e.g. a plain Docker network) it falls back to `0.0.0.0`.
+async fn bind_listener(port: u16) -> Result<(TcpListener, SocketAddr), BoxError> {
+    let v6 = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
+    if let Ok(listener) = TcpListener::bind(v6).await {
+        return Ok((listener, v6));
+    }
+    let v4 = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
+    let listener = TcpListener::bind(v4)
+        .await
+        .map_err(|e| format!("could not bind {v4}: {e}"))?;
+    Ok((listener, v4))
 }
 
 /// `kurtz healthcheck`: used by the Docker HEALTHCHECK (the image has no curl).
